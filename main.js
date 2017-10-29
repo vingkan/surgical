@@ -69,6 +69,12 @@ let mission = {
 
 }
 
+let callbackMap = {
+	ekg: function() {
+		setScreenImage('ekg.png');
+	}
+}
+
 let parts = ['part-facemask', 'part-ivdrip', 'part-scalpel'];
 let areas = ['mouth', 'chest', 'arm'];
 
@@ -137,9 +143,11 @@ recognition.onresult = function(e) {
 			//console.log(t);
 			console.log(`I asked: ${t}`);
 			askAI(t).then((res) => {
-				let resp = mission.dialog[res];
-				console.log(`AI said: ${resp}`);
-				responsiveVoice.speak(resp, "US English Male");
+				if (res in mission.dialog) {
+					let resp = mission.dialog[res];
+					console.log(`AI said: ${resp}`);
+					responsiveVoice.speak(resp, "US English Male");
+				}
 			});
 		}
 	}
@@ -326,6 +334,28 @@ AFRAME.registerComponent('pickupable', {
 		} else {
 			this.el.setAttribute('position', this.data.position);
 		}
+	}
+
+});
+
+
+AFRAME.registerComponent('pressable', {
+
+	init: function() {
+
+		let el = this.el;
+		let props = this.data;
+
+		el.addEventListener('click', function(e) {
+			this.setAttribute('material', 'color', 'white');
+			//console.log(e.detail);
+			if (props.callback) {
+				if (props.callback in callbackMap) {
+					callbackMap[props.callback]();
+				}
+			}
+		});
+
 	}
 
 });
