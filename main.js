@@ -13,7 +13,7 @@ class Timer{
 			}
 			else{
 				clearInterval(interval);
-				console.log("Time's Up Motherfuckers!");
+				console.log("Time's Up!");
 			}
 		}, 1000);
 	}
@@ -87,6 +87,47 @@ function takeAction(action) {
 var timer = new Timer(180);
 timer.start();
 console.log('timer started');
+
+function askAI(textToAsk) {
+	return new Promise((resolve, reject) => {
+		var settings = {
+			"async": true,
+			"crossDomain": true,
+			"url": "https://granite-temper.glitch.me/chatbot",
+			"method": "POST",
+			"headers": {
+			"content-type": "application/json",
+			},
+			"processData": false,
+			"data": `{\n\t\"data\": \"${textToAsk}\"}`
+		}
+
+		$.ajax(settings).done(function (response) {
+			resolve(response);
+		});
+	});
+}
+
+let recognition = new webkitSpeechRecognition();
+
+recognition.continuous = true;
+recognition.interimResults = true;
+recognition.lang = "en";
+recognition.start();
+
+recognition.onresult = function(e) {
+	//let t = e.results[0][0].transcript;
+	for (var i = e.resultIndex; i < e.results.length; ++i) {
+		if (e.results[i].isFinal) {
+			let ed = e.results[i][0];
+			let t = ed.transcript;
+			//console.log(t);
+			askAI(t).then((res) => {
+				console.log(`AI said: ${res}`);
+			});
+		}
+	}
+}
 
 let imageScreen = document.getElementById('image-screen');
 
