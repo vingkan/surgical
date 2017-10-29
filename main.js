@@ -1,24 +1,31 @@
-class Timer {
+class Timer{
 
 	constructor(time){
-		this.time = time;
+		this.time=time;
 	}
 
-	start() {
-		var that = this;
-		setInterval(function() {
-			that.time=that.time-1;
-			//console.log(that.time);
-		},1000);
+	start(){
+		var that=this;
+		var interval = setInterval(function(){
+			if(that.time>0){
+				that.time=that.time-1;
+				console.log(that.time);
+			}
+			else{
+				clearInterval(interval);
+				console.log("Time's Up Motherfuckers!");
+			}
+		}, 1000);
 	}
 
-	minusTime(time_penalty) {
+	minusTime(time_penalty){
 		this.time=this.time-time_penalty;
 	}
 
-	addTime(time_bonus) {
+	addTime(time_bonus){
 		this.time=this.time+time_bonus;
 	}
+
 }
 
 let mission = {
@@ -49,14 +56,37 @@ let mission = {
 	}
 }
 
+let parts = ['part-facemask', 'part-ivdrip', 'part-scalpel'];
+let areas = ['mouth', 'chest', 'arm'];
+
+let matrix = [
+	['give oxygen', false, false],
+	[false, 'general anesthesia', 'vascular surgery'],
+	[false, 'general anesthesia', false]
+];
+
+let midx = 0;
+
+function takeAction(action) {
+	let treatment = mission.ans.treatments[midx];
+	let pidx = parts.indexOf(action.part);
+	let aidx = areas.indexOf(action.area);
+	let used = matrix[aidx][pidx];
+	if (used === treatment) {
+		console.log('success!');
+		midx++;
+	} else {
+		console.log('wrong thing')
+		timer.minusTime(20);
+	}
+	if (midx === mission.ans.treatments.length) {
+		alert('you won its over go home');
+	}
+}
+
 var timer = new Timer(180);
 timer.start();
 console.log('timer started');
-setTimeout(function(){
-	console.log(timer.time);
-},5000);
-setTimeout(function(){timer.minusTime(20);
-console.log('minus timed'+ timer.time);},15000);
 
 let imageScreen = document.getElementById('image-screen');
 
@@ -112,6 +142,14 @@ function subtractVector(v1, v2) {
 	return addVector(v1, scaleVector(v2, -1));
 }
 
+function degToRad(deg) {
+	return (deg / 180) * (Math.PI);
+}
+
+function angleVector(v, a) {
+
+}
+
 let patientEl = document.getElementById('patient');
 
 AFRAME.registerComponent('body-part', {
@@ -129,6 +167,10 @@ AFRAME.registerComponent('body-part', {
 			blinkCursor();
 			let part = (getHeld() || {}).id || 'nothing';
 			console.log(`Used ${part} on the patient's ${props.area}.`);
+			takeAction({
+				part: part,
+				area: props.area
+			});
 			setHeld(null);
 		});
 
@@ -222,7 +264,7 @@ AFRAME.registerComponent('pickupable', {
 			let ray = getRay();
 			let dir = scaleVector(ray.direction, -1);
 			dir = subtractVector(ray.origin, dir);
-			let cursorPos = scaleVector(dir, 1.1);
+			let cursorPos = scaleVector(dir, 1);
 			this.el.setAttribute('position', cursorPos);
 		} else {
 			this.el.setAttribute('position', this.data.position);
