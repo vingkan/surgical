@@ -52,7 +52,7 @@ let mission = {
 	},
 
 	test_results: {
-		EKG:{src:"EKGnormal1.jpg",time_penalty:20},
+		ekg:{src:"ekg.png",time_penalty:20},
 		CXR:{src:"CXR-Chest-Lung3.jpg",time_penalty:40},
 		CTS:{src:"CTS-1.jpg",time_penalty:60},
 		HR:79,
@@ -70,8 +70,10 @@ let mission = {
 }
 
 let callbackMap = {
-	ekg: function() {
-		setScreenImage('ekg.png');
+	runTest: function(key) {
+		let test = mission.test_results[key];
+		setScreenImage(test.src);
+		timer.minusTime(test.time_penalty);
 	}
 }
 
@@ -351,7 +353,7 @@ AFRAME.registerComponent('pressable', {
 			//console.log(e.detail);
 			if (props.callback) {
 				if (props.callback in callbackMap) {
-					callbackMap[props.callback]();
+					callbackMap[props.callback](props.key);
 				}
 			}
 		});
