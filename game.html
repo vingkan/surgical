@@ -38,20 +38,27 @@
 		<a-text id="timer" text="align: center; width: 20; value: 180"
 				position="-2 2 -1" rotation="0 90 0" wrap-count="80"></a-text>
 
-		<a-cylinder pressable="callback: runTest; key: cxr" position="-2 -0.75 -2.25"
+		<a-cylinder pressable="callback: runTest; key: cxr"
+					position="-2 -0.75 -2.25"
 					radius="0.1" height="0.5"
 					color="#5ca9e0" shadow>
 		</a-cylinder>
 
 		<a-cylinder pressable="callback: runTest; key: ekg;"
-					position="-2 -0.75 -1.25"
+					position="-2 -0.75 -1.575"
 					radius="0.1" height="0.5"
 					color="#FFC65D" shadow>
 		</a-cylinder>
 
-		<a-cylinder pressable="callback: runTest; key: ctscan" position="-2 -0.75 -0.25"
+		<a-cylinder pressable="callback: runTest; key: ctscan"
+					position="-2 -0.75 -0.925"
 					radius="0.1" height="0.5"
 					color="#e84533" shadow>
+		</a-cylinder>
+
+		<a-cylinder pickupable id="part-aspirin" position="-2 -0.75 -0.25"
+					radius="0.1" height="0.5"
+					color="purple" shadow>
 		</a-cylinder>
 
 		<a-entity id="part-facemask"
@@ -123,6 +130,12 @@
 				color="white" opacity="0.25">
 		</a-plane>
 
+		<a-plane body-part="area: abdomen;"
+				position="2 -0.4 -2.25" rotation="-90 0 0"
+				width="0.75" height="0.5"
+				color="white" opacity="0.25">
+		</a-plane>
+
 		<a-entity id="patient" material="metalness: 0.05; color: #916c54;"
 					obj-model="obj: #obj-female;" position="2 -0.5 0"
 					scale="0.25 0.25 0.25" rotation="-90 -90 90" shadow>
@@ -166,6 +179,46 @@
 		</a-camera>
 
 	</a-scene>
+
+	<script src="https://www.gstatic.com/firebasejs/4.6.0/firebase.js"></script>
+	<script type="text/javascript">
+
+		function getQueryParams(qs) {
+			qs = qs.split('+').join(' ');
+			var params = {},
+				tokens,
+				re = /[?&]?([^=]+)=([^&]*)/g;
+			while (tokens = re.exec(qs)) {
+				params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+			}
+			return params;
+		}
+
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyCsTL7ZOxNOAUByHQVgGAUIW6OcjXbaCDQ",
+			authDomain: "borkedin.firebaseapp.com",
+			databaseURL: "https://borkedin.firebaseio.com",
+			projectId: "borkedin",
+			storageBucket: "borkedin.appspot.com",
+			messagingSenderId: "769825906375"
+		};
+		firebase.initializeApp(config);
+		let db = firebase.database();
+
+		
+		let params = getQueryParams(document.location.search);
+
+		db.ref(`operationvr/games/${params.id}`).once('value', (snap) => {
+			let val = snap.val() || false;
+			if (val) {
+				main(val);
+			} else {
+				main(false);
+			}
+		});
+
+	</script>
 
 </body>
 </html>

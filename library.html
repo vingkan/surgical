@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Operation VR</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.0/css/bulma.min.css">
+</head>
+<body>
+
+	<audio controls autoplay loop style="display: none;">
+		<source src="./heartattacksound.mp3" type="audio/mpeg">
+		Your browser does not support the immersive sound experience we have created.
+	</audio>
+
+	<section class="hero is-success">
+		<div class="hero-body">
+			<div class="container">
+				<h1 class="title is-1">Operation VR</h1>
+				<hr>
+				<h2 class="subtitle is-4">Choose a patient to test your skills under pressure.</h2>
+			</div>
+		</div>
+	</section>
+	<section class="section">
+		<div class="container">
+			<div class="content">
+				<h2 class="title is-2">Submit Scenario</h2>
+				<p class="subtitle is-5">Paste your spreadsheet row below. You can use <a class="link" href="https://docs.google.com/spreadsheets/d/1z6_lzdKAxDPLa4uxPRbkGFrBoIq21DkG4eGhNsks0hw/edit?usp=sharing">this sheet</a> as a template.</p>
+				<textarea id="submission" class="textarea"></textarea>
+				<br>
+				<button id="submit" class="button is-success">Submit</button>
+				<h2 class="title is-2">Scenario Library</h2>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Patient</th>
+							<th>Description</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody id="tbody">
+						<tr>
+							<td>Suzette Williams</td>
+							<td>I was walking up the stairs and I started feeling a pain...</td>
+							<td>
+								<a href="./game.html?id=suzette" class="button is-success is-outlined">Play</a>
+								<button data-delete="suzette" class="button is-danger is-outlined">Delete</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+	<script src="https://www.gstatic.com/firebasejs/4.6.0/firebase.js"></script>
+	<script>
+
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyCsTL7ZOxNOAUByHQVgGAUIW6OcjXbaCDQ",
+			authDomain: "borkedin.firebaseapp.com",
+			databaseURL: "https://borkedin.firebaseio.com",
+			projectId: "borkedin",
+			storageBucket: "borkedin.appspot.com",
+			messagingSenderId: "769825906375"
+		};
+		firebase.initializeApp(config);
+		let db = firebase.database();
+
+		document.getElementById('submit').addEventListener('click', (e) => {
+			let text = document.getElementById('submission').value;
+			if (text) {
+				let d = text.split('\t');
+				let data = {
+
+					ans: {
+						condition: d[11],
+						treatments:[
+							{src: d[8], time_penalty:25},
+							{src: d[9], time_penalty:15},
+							{src: d[10], time_penalty:60}
+						]//ordered
+					},
+
+					p_overview: {
+						name: d[0],
+						age: 32,
+						weight: 230,
+						height: "5,7",
+						notes: d[1],
+						gender: d[5]
+					},
+
+					scene: {
+						vomit: true,
+						moaning: true,
+						speech: true,
+						concious: true,
+						time: 180
+					},
+
+					test_results: {
+						ekg:{src:"ekg.png",time_penalty:20},
+						cxr:{src:"cxr.png",time_penalty:40},
+						ctscan:{src:"ctscan.png",time_penalty:60},
+						HR:79,
+						BP:180
+					},
+
+					dialog: {
+						where_pain: d[2],
+						pain_value: d[3],
+						story: d[4],
+						current_medicine: d[12],
+						allergies: d[13],
+						food: d[6],
+						smoke: d[7]
+					}
+
+				}
+				db.ref(`operationvr/games`).push(data);
+				document.getElementById('submission').value = '';
+			}
+		});
+
+		let tbody = document.getElementById('tbody');
+
+		db.ref(`operationvr/games`).on('value', (snap) => {
+			let val = snap.val();
+
+			tbody.innerHTML = ``;
+
+			for (let gid in val) {
+				let game = val[gid];
+
+				let html = `<td>${game.p_overview.name}</td>
+				<td>${game.p_overview.notes.substr(0, 40)}...</td>
+				<td>
+					<a href="./game.html?id=${gid}" class="button is-success is-outlined">Play</a>
+					<button data-delete="${gid}" class="button is-danger is-outlined">Delete</button>
+				</td>`;
+				let tr = document.createElement('tr');
+				tr.innerHTML = html;
+				tbody.appendChild(tr);
+
+				console.log(game);
+			}
+
+			Array.from(document.querySelectorAll('[data-delete]')).forEach((btn) => {
+				btn.addEventListener('click', (e) => {
+					let gid = btn.dataset.delete;
+					let c = prompt(`Are you sure you want to delete game {${gid}}? (y/n)`);
+					if (c === 'y') {
+						db.ref(`operationvr/games/${gid}`).remove();
+					}
+				});
+			});
+
+		});
+
+	</script>
+</body>
+</html>

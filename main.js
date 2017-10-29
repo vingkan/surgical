@@ -11,7 +11,7 @@ class Timer{
 		var interval = setInterval(function(){
 			if(that.time>0){
 				that.time=that.time-1;
-				console.log(that.time);
+				//console.log(that.time);
 				timerEl.setAttribute('text', 'value', that.time);
 			}
 			else{
@@ -31,7 +31,7 @@ class Timer{
 
 }
 
-let mission = {
+let missionTest = {
 
 	ans: {
 		condition:"Pneumothoratic tension",
@@ -43,7 +43,8 @@ let mission = {
 		age:32,
 		weight: 230,
 		height:"5,7",
-		notes: "Grandmother has diabetes. Had foot surgery 3 years ago."
+		notes: "Grandmother has diabetes. Had foot surgery 3 years ago.",
+		gender: 'female'
 	},
 
 	scene: {
@@ -67,26 +68,38 @@ let mission = {
 		pain_value:"it really hurts, it's like an 8",
 		story:"I was walking up the stairs and I started feeling a pain in my left arm,my neck, knee and chest",
 		current_medicine:"nope",
-		allergies:"pennicillin"
+		allergies:"pennicillin",
+		food: 'Mcnuggets, Bigmac',
+		smoke: 'I smoke occasionally'
 	}
 
 }
 
+let MISSION = false;
+
+function getMission() {
+	return MISSION || missionTest;
+}
+
 let callbackMap = {
 	runTest: function(key) {
+		let mission = getMission();
 		let test = mission.test_results[key];
 		setScreenImage(test.src);
 		timer.minusTime(test.time_penalty);
 	}
 }
 
-let parts = ['part-facemask', 'part-ivdrip', 'part-scalpel'];
-let areas = ['mouth', 'chest', 'arm'];
+// columns
+let parts = ['part-facemask', 'part-ivdrip', 'part-scalpel', 'aspirin'];
+// rows
+let areas = ['mouth', 'chest', 'arm', 'abdomen'];
 
 let matrix = [
-	['give oxygen', false, false],
-	[false, 'general anesthesia', 'vascular surgery'],
-	[false, 'general anesthesia', false]
+	['give oxygen', false, false, 'give aspirin'],
+	[false, false, 'vascular surgery', false],
+	[false, 'general anesthesia', 'catheterization', false],
+	[false, false, 'apendisectomy', false]
 ];
 
 function lightIndicator(num, win) {
@@ -100,6 +113,7 @@ function lightIndicator(num, win) {
 let midx = 0;
 
 function takeAction(action) {
+	let mission = getMission();
 	let treatment = mission.ans.treatments[midx];
 	let pidx = parts.indexOf(action.part);
 	let aidx = areas.indexOf(action.area);
@@ -117,10 +131,6 @@ function takeAction(action) {
 		alert('You have saved this patient!');
 	}
 }
-
-var timer = new Timer(180);
-timer.start();
-console.log('timer started');
 
 function askAI(textToAsk) {
 	return new Promise((resolve, reject) => {
@@ -142,30 +152,49 @@ function askAI(textToAsk) {
 	});
 }
 
-let recognition = new webkitSpeechRecognition();
+var timer = {};
 
-recognition.continuous = true;
-recognition.interimResults = true;
-recognition.lang = "en";
-recognition.start();
+function main(missionData) {
 
-recognition.onresult = function(e) {
-	//let t = e.results[0][0].transcript;
-	for (var i = e.resultIndex; i < e.results.length; ++i) {
-		if (e.results[i].isFinal) {
-			let ed = e.results[i][0];
-			let t = ed.transcript;
-			//console.log(t);
-			console.log(`I asked: ${t}`);
-			askAI(t).then((res) => {
-				if (res in mission.dialog) {
-					let resp = mission.dialog[res];
-					console.log(`AI said: ${resp}`);
-					responsiveVoice.speak(resp, "US English Female");
-				}
-			});
+	MISSION = missionData || missionTest;
+
+	let mission = getMission();
+
+	if (mission.p_overview.gender !== 'female') {
+		patientEl.setAttribute('obj-model', 'obj', '#obj-male');
+	}
+
+	timer = new Timer(180);
+	timer.start();
+	console.log('timer started');
+
+	let recognition = new webkitSpeechRecognition();
+
+	recognition.continuous = true;
+	recognition.interimResults = true;
+	recognition.lang = "en";
+	recognition.start();
+
+	recognition.onresult = function(e) {
+		//let t = e.results[0][0].transcript;
+		for (var i = e.resultIndex; i < e.results.length; ++i) {
+			if (e.results[i].isFinal) {
+				let ed = e.results[i][0];
+				let t = ed.transcript;
+				//console.log(t);
+				console.log(`I asked: ${t}`);
+				askAI(t).then((res) => {
+					console.log(mission)
+					if (res in mission.dialog) {
+						let resp = mission.dialog[res];
+						console.log(`AI said: ${resp}`);
+						responsiveVoice.speak(resp, "US English Female");
+					}
+				});
+			}
 		}
 	}
+
 }
 
 let imageScreen = document.getElementById('image-screen');
@@ -173,10 +202,6 @@ let imageScreen = document.getElementById('image-screen');
 function setScreenImage(url) {
 	imageScreen.setAttribute('src', url);
 }
-
-setTimeout(function(){
-	setScreenImage('lungs2.jpg');
-}, 2000);
 
 let cursorEl = document.getElementById('cursor');
 
@@ -220,14 +245,6 @@ function addVector(v1, v2) {
 // v1 - v2
 function subtractVector(v1, v2) {
 	return addVector(v1, scaleVector(v2, -1));
-}
-
-function degToRad(deg) {
-	return (deg / 180) * (Math.PI);
-}
-
-function angleVector(v, a) {
-
 }
 
 let patientEl = document.getElementById('patient');
@@ -379,5 +396,3 @@ AFRAME.registerComponent('pressable', {
 	}
 
 });
-
-
