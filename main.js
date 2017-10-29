@@ -16,7 +16,7 @@ class Timer{
 			}
 			else{
 				clearInterval(interval);
-				console.log("Time's Up!");
+				alert(`Time's up! This patient had to be taken to intensive care.`);
 			}
 		}, 1000);
 	}
@@ -56,8 +56,8 @@ let mission = {
 
 	test_results: {
 		ekg:{src:"ekg.png",time_penalty:20},
-		CXR:{src:"CXR-Chest-Lung3.jpg",time_penalty:40},
-		CTS:{src:"CTS-1.jpg",time_penalty:60},
+		cxr:{src:"cxr.png",time_penalty:40},
+		ctscan:{src:"ctscan.png",time_penalty:60},
 		HR:79,
 		BP:180
 	},
@@ -89,6 +89,14 @@ let matrix = [
 	[false, 'general anesthesia', false]
 ];
 
+function lightIndicator(num, win) {
+	if (win) {
+		document.querySelector(`[data-lit="${num}"]`).setAttribute('material', 'color', 'lime');
+	} else {
+		document.querySelector(`[data-lit="${num}"]`).setAttribute('material', 'color', 'red');
+	}
+}
+
 let midx = 0;
 
 function takeAction(action) {
@@ -99,12 +107,14 @@ function takeAction(action) {
 	if (used === treatment.src) {
 		console.log('success!');
 		midx++;
+		lightIndicator(midx, true);
 	} else {
 		console.log('wrong thing')
+		lightIndicator(midx + 1, false);
 		timer.minusTime(treatment.time_penalty);
 	}
 	if (midx === mission.ans.treatments.length) {
-		alert('you won its over go home');
+		alert('You have saved this patient!');
 	}
 }
 
@@ -151,7 +161,7 @@ recognition.onresult = function(e) {
 				if (res in mission.dialog) {
 					let resp = mission.dialog[res];
 					console.log(`AI said: ${resp}`);
-					responsiveVoice.speak(resp, "US English Male");
+					responsiveVoice.speak(resp, "US English Female");
 				}
 			});
 		}

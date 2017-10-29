@@ -38,7 +38,7 @@
 		<a-text id="timer" text="align: center; width: 20; value: 180"
 				position="-2 2 -1" rotation="0 90 0" wrap-count="80"></a-text>
 
-		<a-cylinder pickupable position="-2 -0.75 -2.25"
+		<a-cylinder pressable="callback: runTest; key: cxr" position="-2 -0.75 -2.25"
 					radius="0.1" height="0.5"
 					color="#5ca9e0" shadow>
 		</a-cylinder>
@@ -49,7 +49,7 @@
 					color="#FFC65D" shadow>
 		</a-cylinder>
 
-		<a-cylinder pickupable position="-2 -0.75 -0.25"
+		<a-cylinder pressable="callback: runTest; key: ctscan" position="-2 -0.75 -0.25"
 					radius="0.1" height="0.5"
 					color="#e84533" shadow>
 		</a-cylinder>
@@ -111,6 +111,12 @@
 				color="white" opacity="0.25">
 		</a-circle>
 
+		<a-plane body-part="area: arm;"
+				position="3 -0.4 -2.75" rotation="-90 -40 0"
+				width="1.0" height="0.25"
+				color="white" opacity="0.25">
+		</a-plane>
+
 		<a-plane body-part="area: chest;"
 				position="2 -0.4 -3" rotation="-90 0 0"
 				width="0.75" height="0.5"
@@ -126,6 +132,21 @@
 				width="5" height="7" metalness="0.4"
 				color="#313a47" shadow>
 		</a-plane>
+
+		<a-circle data-lit="1" position="1 -1 0.75" rotation="-90 0 0"
+					material="color: gray; opacity: 0.5"
+					radius="0.125">
+		</a-circle>
+
+		<a-circle data-lit="2" position="2 -1 0.75" rotation="-90 0 0"
+					material="color: gray; opacity: 0.5"
+					radius="0.125">
+		</a-circle>
+
+		<a-circle data-lit="3" position="3 -1 0.75" rotation="-90 0 0"
+					material="color: gray; opacity: 0.5"
+					radius="0.125">
+		</a-circle>
 
 		<a-sky src="./hospital.jpg"></a-sky>
 		<!--<a-sky color="black"></a-sky>-->
