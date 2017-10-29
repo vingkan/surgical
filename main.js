@@ -91,7 +91,7 @@ let callbackMap = {
 }
 
 // columns
-let parts = ['part-facemask', 'part-ivdrip', 'part-scalpel', 'aspirin'];
+let parts = ['part-facemask', 'part-ivdrip', 'part-scalpel', 'part-aspirin'];
 // rows
 let areas = ['mouth', 'chest', 'arm', 'abdomen'];
 
@@ -188,7 +188,7 @@ function main(missionData) {
 					if (res in mission.dialog) {
 						let resp = mission.dialog[res];
 						console.log(`AI said: ${resp}`);
-						responsiveVoice.speak(resp, "US English Female");
+						responsiveVoice.speak(resp, mission.p_overview.gender === 'female' ? "US English Female" : 'US English Male');
 					}
 				});
 			}
