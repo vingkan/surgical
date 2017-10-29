@@ -334,7 +334,7 @@ AFRAME.registerComponent('pickupable', {
 			let ray = getRay();
 			let dir = scaleVector(ray.direction, -1);
 			dir = subtractVector(ray.origin, dir);
-			let cursorPos = scaleVector(dir, 1);
+			let cursorPos = scaleVector(dir, 1.3);
 			this.el.setAttribute('position', cursorPos);
 		} else {
 			this.el.setAttribute('position', this.data.position);
