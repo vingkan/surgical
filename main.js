@@ -1,3 +1,5 @@
+let timerEl = document.getElementById('timer');
+
 class Timer{
 
 	constructor(time){
@@ -10,6 +12,7 @@ class Timer{
 			if(that.time>0){
 				that.time=that.time-1;
 				console.log(that.time);
+				timerEl.setAttribute('text', 'value', that.time);
 			}
 			else{
 				clearInterval(interval);
@@ -61,7 +64,7 @@ let mission = {
 
 	dialog: {
 		where_pain:"in my chest",
-		pain_value:8,
+		pain_value:"it really hurts, it's like an 8",
 		story:"I was walking up the stairs and I started feeling a pain in my left arm,my neck, knee and chest",
 		current_medicine:"nope",
 		allergies:"pennicillin"
@@ -342,6 +345,11 @@ AFRAME.registerComponent('pickupable', {
 
 
 AFRAME.registerComponent('pressable', {
+
+	schema: {
+		callback: {type: 'string', default: ''},
+		key: {type: 'string', default: ''}
+	},
 
 	init: function() {
 

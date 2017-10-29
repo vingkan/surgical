@@ -14,8 +14,8 @@
 </head>
 <body>
 
-	<audio controls autoplay style="display: none;">
-		<source src="./background.mp3" type="audio/mpeg">
+	<audio controls autoplay loop style="display: none;">
+		<source src="./heartattacksound.mp3" type="audio/mpeg">
 		Your browser does not support the immersive sound experience we have created.
 	</audio>
 
@@ -34,6 +34,9 @@
 		</a-image>
 
 		<!-- Side Table -->
+
+		<a-text id="timer" text="align: center; width: 20; value: 180"
+				position="-2 2 -1" rotation="0 90 0" wrap-count="80"></a-text>
 
 		<a-cylinder pickupable position="-2 -0.75 -2.25"
 					radius="0.1" height="0.5"
@@ -94,7 +97,7 @@
 				material="color: white; opacity: 0.2;">
 		</a-box>
 
-		<a-entity position="6 -0.5 -5" rotation="0 90 0"
+		<a-entity position="6 0.5 -5" rotation="0 90 0"
 					obj-model="obj: #obj-plumbus;"
 					material="color: #EAA1E0; opacity: 0.5;"
 					scale="0.15 0.15 0.15" shadow>
@@ -124,8 +127,8 @@
 				color="#313a47" shadow>
 		</a-plane>
 
-		<!--<a-sky src="./hospital.jpg"></a-sky>-->
-		<a-sky color="black"></a-sky>
+		<a-sky src="./hospital.jpg"></a-sky>
+		<!--<a-sky color="black"></a-sky>-->
 
 
 		<!--<a-cursor geometry="primitive: ring; radius-outer: 0.1; radius-inner: 0.05" material="color: red" opacity="0.7" fuse="true"></a-cursor>
