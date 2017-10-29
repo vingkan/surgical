@@ -29,17 +29,20 @@ class Timer{
 }
 
 let mission = {
+
 	ans: {
 		condition:"Pneumothoratic tension",
-		treatments:["general anesthesia","give oxygen","vascular surgery"]//ordered
+		treatments:[{src:"general anesthesia",time_penalty:25},{src:"give oxygen",time_penalty:15},{src:"vascular surgery",time_penalty:60}]//ordered
 	},
+
 	p_overview: {
 		name: "Suzette Williams",
 		age:32,
 		weight: 230,
 		height:"5,7",
-		notes: "Grandmother has diabetes, had foot surgery 3 years ago"
+		notes: " Grandmother has diabetes. Had foot surgery 3 years ago."
 	},
+
 	scene: {
 		vomit:true,
 		moaning:true,
@@ -47,13 +50,23 @@ let mission = {
 		concious:true,
 		time:180
 	},
+
 	test_results: {
 		EKG:{src:"EKGnormal1.jpg",time_penalty:20},
 		CXR:{src:"CXR-Chest-Lung3.jpg",time_penalty:40},
 		CTS:{src:"CTS-1.jpg",time_penalty:60},
 		HR:79,
 		BP:180
+	},
+
+	dialog: {
+		where_pain:"in my chest",
+		pain_value:8,
+		story:"I was walking up the stairs and I started feeling a pain in my left arm,my neck, knee and chest",
+		current_medicine:"nope",
+		allergies:"pennicillin"
 	}
+
 }
 
 let parts = ['part-facemask', 'part-ivdrip', 'part-scalpel'];
@@ -72,12 +85,12 @@ function takeAction(action) {
 	let pidx = parts.indexOf(action.part);
 	let aidx = areas.indexOf(action.area);
 	let used = matrix[aidx][pidx];
-	if (used === treatment) {
+	if (used === treatment.src) {
 		console.log('success!');
 		midx++;
 	} else {
 		console.log('wrong thing')
-		timer.minusTime(20);
+		timer.minusTime(treatment.time_penalty);
 	}
 	if (midx === mission.ans.treatments.length) {
 		alert('you won its over go home');
@@ -122,8 +135,11 @@ recognition.onresult = function(e) {
 			let ed = e.results[i][0];
 			let t = ed.transcript;
 			//console.log(t);
+			console.log(`I asked: ${t}`);
 			askAI(t).then((res) => {
-				console.log(`AI said: ${res}`);
+				let resp = mission.dialog[res];
+				console.log(`AI said: ${resp}`);
+				responsiveVoice.speak(resp, "US English Male");
 			});
 		}
 	}
