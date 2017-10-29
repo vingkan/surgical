@@ -43,7 +43,7 @@ let mission = {
 		age:32,
 		weight: 230,
 		height:"5,7",
-		notes: " Grandmother has diabetes. Had foot surgery 3 years ago."
+		notes: "Grandmother has diabetes. Had foot surgery 3 years ago."
 	},
 
 	scene: {
